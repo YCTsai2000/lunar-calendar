@@ -1,0 +1,41 @@
+name: Update Lunar Calendar
+
+on:
+  schedule:
+    - cron: "10 16 1 * *"
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "generate_lunar_calendar.py"
+
+permissions:
+  contents: write
+
+jobs:
+  update-ics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install lunar_python opencc-python-reimplemented
+
+      - name: Generate lunar calendar
+        run: |
+          python3 generate_lunar_calendar.py --years-ahead 3
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/lunar.ics
+          git diff --staged --quiet || git commit -m "Auto-update lunar calendar $(date -u +%Y-%m-%d)"
+          git push
