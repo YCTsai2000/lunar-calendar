@@ -117,6 +117,11 @@ def build_event(solar_date: datetime.date, uid_prefix: str, now_stamp: str) -> s
         "STATUS:CONFIRMED",
         f"SUMMARY:{ics_escape(summary)}",
         "TRANSP:OPAQUE",
+        "BEGIN:VALARM",
+        "ACTION:DISPLAY",
+        f"DESCRIPTION:{ics_escape(summary)}",
+        "TRIGGER:-PT5H",
+        "END:VALARM",
         "END:VEVENT",
     ]
     return "\r\n".join(fold_line(l) for l in lines)
